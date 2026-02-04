@@ -13,5 +13,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         String timeSlot,
         AppointmentStatus status
     );
+
+    long countByAppointmentDate(LocalDate appointmentDate);
+
+    java.util.List<Appointment> findByAppointmentDate(LocalDate appointmentDate);
 }
 

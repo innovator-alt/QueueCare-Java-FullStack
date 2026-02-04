@@ -12,6 +12,7 @@ import com.queuecare.model.enums.AppointmentStatus;
 import com.queuecare.repository.AppointmentRepository;
 import com.queuecare.repository.DoctorRepository;
 import com.queuecare.repository.PatientRepository;
+import com.queuecare.service.QueueService;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +23,18 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final QueueService queueService;
 
     public AppointmentService(
         AppointmentRepository appointmentRepository,
         PatientRepository patientRepository,
-        DoctorRepository doctorRepository
+        DoctorRepository doctorRepository,
+        QueueService queueService
     ) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;
+        this.queueService = queueService;
     }
 
     @Transactional
@@ -60,6 +64,7 @@ public class AppointmentService {
             .build();
 
         Appointment saved = appointmentRepository.save(appointment);
+        queueService.enqueueIfTodayAndBooked(saved);
         return toResponse(saved);
     }
 
@@ -87,6 +92,7 @@ public class AppointmentService {
         appointment.setTimeSlot(request.getTimeSlot());
 
         Appointment saved = appointmentRepository.save(appointment);
+        queueService.enqueueIfTodayAndBooked(saved);
         return toResponse(saved);
     }
 
